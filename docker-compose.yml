@@ -1,0 +1,9 @@
+# docker-compose.yml (루트 폴더에)
+version: "3.8"
+services:
+  backend:
+    build: ./DingQ_BE
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./DingQ_BE:/app
