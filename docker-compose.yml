@@ -1,9 +1,48 @@
 # docker-compose.yml (루트 폴더에)
-version: "3.8"
+
 services:
+  # PostgreSQL Database
+  postgres:
+    image: pgvector/pgvector:pg15
+    environment:
+      - POSTGRES_USER=dingq_user
+      - POSTGRES_PASSWORD=dingq_password
+      - POSTGRES_DB=dingq_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./DingQ_BE/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dingq_user -d dingq_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # FastAPI Backend
   backend:
-    build: ./DingQ_BE
+    build: 
+      context: ./DingQ_BE
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./DingQ_BE:/app
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://dingq_user:dingq_password@postgres:5432/dingq_db
+      - CLIP_MODEL_NAME=openai/clip-vit-base-patch32
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # CLIP model loading time
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
