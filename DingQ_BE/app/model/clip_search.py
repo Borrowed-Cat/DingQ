@@ -91,7 +91,7 @@ class CLIPImageSearcher:
         
         image = Image.open(image_path)
         processed_image = self.preprocess_icon_image(image)
-        inputs = self.processor(images=[processed_image], return_tensors="pt")
+        inputs = self.processor(images=[processed_image], return_tensors="pt")  # type: ignore
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         
         with torch.no_grad():
@@ -160,9 +160,9 @@ class CLIPImageSearcher:
             return json.dumps(error_result, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
-    query_image_path = r"C:\Users\mh\Desktop\swbootcamp\test13.png"
-    reference_data_path = r"C:\Users\mh\Desktop\swbootcamp\project\reference_combined_augmented_posted_data.npz"
-    
+    query_image_path = "test.png"
+    reference_data_path = "vectorweight.npz"
+
     # 검색기 초기화 (모델과 데이터를 한번만 로드)
     searcher = CLIPImageSearcher(reference_data_path)
     
