@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'presentation/pages/home_page.dart';
+import 'presentation/providers/dingbat_provider.dart';
 
 void main() {
   runApp(
