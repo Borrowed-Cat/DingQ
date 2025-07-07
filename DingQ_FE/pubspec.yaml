@@ -40,6 +40,9 @@ dependencies:
   
   # SVG support
   flutter_svg: ^2.0.10
+  
+  # HTTP requests
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:

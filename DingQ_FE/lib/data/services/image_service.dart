@@ -1,26 +1,30 @@
 import 'dart:ui' as ui;
 import 'dart:typed_data';
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'api_service.dart';
 
 /// Image service for Flutter Web
 class ImageService {
   /// Margin size (pixels)
   static const double margin = 80.0;
 
-  /// Save canvas area as PNG (crop by stroke bounds + add margin)
-  static Future<String?> saveCanvasAsPng(
+  /// Send canvas area to API (crop by stroke bounds + add margin)
+  static Future<void> sendCanvasToApi(
     GlobalKey canvasKey,
     Rect bounds,
   ) async {
     try {
+      print('=== Image Generation ===');
+      print('Canvas Bounds: $bounds');
+      
       // Find RenderRepaintBoundary
       final RenderRepaintBoundary? boundary = canvasKey.currentContext
           ?.findRenderObject() as RenderRepaintBoundary?;
       
       if (boundary == null) {
-        return null;
+        print('Error: RenderRepaintBoundary not found');
+        return;
       }
 
       // Calculate bounds with margin
@@ -30,43 +34,52 @@ class ImageService {
         bounds.right + margin,
         bounds.bottom + margin,
       );
+      
+      print('Bounds with margin: $boundsWithMargin');
 
       // Generate full image
+      print('Generating full image...');
       final ui.Image fullImage = await boundary.toImage(pixelRatio: 1.0);
+      print('Full image size: ${fullImage.width}x${fullImage.height}');
 
       // Crop by stroke bounds + margin
+      print('Cropping image...');
       final ui.Image croppedImage = await cropImage(fullImage, boundsWithMargin);
+      print('Cropped image size: ${croppedImage.width}x${croppedImage.height}');
 
       // Convert to ByteData
+      print('Converting to PNG...');
       final ByteData? byteData = await croppedImage.toByteData(
         format: ui.ImageByteFormat.png,
       );
       
       if (byteData == null) {
-        return null;
+        print('Error: Failed to convert image to ByteData');
+        return;
       }
 
       // Convert to Uint8List
       final Uint8List pngBytes = byteData.buffer.asUint8List();
+      print('PNG size: ${pngBytes.length} bytes');
       
-      // Create Blob
-      final html.Blob blob = html.Blob([pngBytes]);
+      // Check PNG header (should start with 0x89, 0x50, 0x4E, 0x47)
+      if (pngBytes.length >= 4) {
+        final header = pngBytes.take(4).toList();
+        print('PNG header: ${header.map((b) => '0x${b.toRadixString(16).padLeft(2, '0')}').join(' ')}');
+        if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47) {
+          print('✓ Valid PNG header detected');
+        } else {
+          print('✗ Invalid PNG header');
+        }
+      }
       
-      // Generate filename with timestamp
-      final String fileName = 'drawing_${DateTime.now().millisecondsSinceEpoch}.png';
+      print('===================');
+
+      // Send to API
+      await ApiService.searchSimilarImages(pngBytes);
       
-      // Create download link
-      final String url = html.Url.createObjectUrlFromBlob(blob);
-      html.AnchorElement(href: url)
-        ..setAttribute('download', fileName)
-        ..click();
-      
-      // Revoke URL
-      html.Url.revokeObjectUrl(url);
-      
-      return fileName;
     } catch (e) {
-      return null;
+      print('Error sending image to API: $e');
     }
   }
 

@@ -1,8 +1,8 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/stroke.dart';
-import '../../domain/entities/stroke_bounds.dart';
 import '../../data/services/image_service.dart';
+import '../../domain/entities/stroke.dart';
 import '../providers/stroke_provider.dart';
 
 /// Drawing canvas widget
@@ -14,100 +14,110 @@ class DrawingCanvas extends ConsumerStatefulWidget {
 }
 
 class _DrawingCanvasState extends ConsumerState<DrawingCanvas> {
-  Stroke? _currentStroke;
-  bool _isDrawing = false;
   final GlobalKey _canvasKey = GlobalKey();
+  List<Offset> _currentPoints = [];
+  bool _isDrawing = false;
 
   @override
   Widget build(BuildContext context) {
     final strokes = ref.watch(strokesProvider);
 
-    return RepaintBoundary(
-      key: _canvasKey,
-      child: GestureDetector(
-        onPanStart: _onPanStart,
-        onPanUpdate: _onPanUpdate,
-        onPanEnd: _onPanEnd,
+    return GestureDetector(
+      onPanStart: (details) {
+        setState(() {
+          _isDrawing = true;
+          _currentPoints = [details.localPosition];
+        });
+      },
+      onPanUpdate: (details) {
+        if (_isDrawing) {
+          setState(() {
+            _currentPoints.add(details.localPosition);
+          });
+        }
+      },
+      onPanEnd: (details) {
+        if (_isDrawing && _currentPoints.isNotEmpty) {
+          // Add stroke to provider
+          final stroke = Stroke(
+            points: List.from(_currentPoints),
+            color: Colors.black,
+            strokeWidth: 18.0,
+          );
+          ref.read(strokesProvider.notifier).addStroke(stroke);
+
+          // Send to API
+          _sendToApi();
+
+          setState(() {
+            _isDrawing = false;
+            _currentPoints = [];
+          });
+        }
+      },
+      child: RepaintBoundary(
+        key: _canvasKey,
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.95),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.grey.shade200.withOpacity(0.5),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.white,
           child: CustomPaint(
-            painter: _CanvasPainter(
+            painter: _DrawingPainter(
               strokes: strokes,
-              currentStroke: _currentStroke,
+              currentPoints: _currentPoints,
+              isDrawing: _isDrawing,
             ),
-            size: Size.infinite,
           ),
         ),
       ),
     );
   }
 
-  /// Start drawing
-  void _onPanStart(DragStartDetails details) {
-    setState(() {
-      _isDrawing = true;
-      _currentStroke = Stroke(
-        points: [details.localPosition],
-        color: Colors.black,
-        strokeWidth: 18.0,
-      );
-    });
+  /// Send current drawing to API
+  void _sendToApi() {
+    final strokes = ref.read(strokesProvider);
+    if (strokes.isEmpty) return;
+
+    // Calculate bounds of all strokes
+    final bounds = _calculateStrokeBounds(strokes);
+    if (bounds == null) return;
+
+    // Send to API
+    ImageService.sendCanvasToApi(_canvasKey, bounds);
   }
 
-  /// Drawing in progress
-  void _onPanUpdate(DragUpdateDetails details) {
-    if (_isDrawing && _currentStroke != null) {
-      setState(() {
-        _currentStroke = _currentStroke!.addPoint(details.localPosition);
-      });
-    }
-  }
+  /// Calculate bounding rectangle of all strokes
+  Rect? _calculateStrokeBounds(List<Stroke> strokes) {
+    if (strokes.isEmpty) return null;
 
-  /// End drawing
-  void _onPanEnd(DragEndDetails details) async {
-    if (_isDrawing && _currentStroke != null && _currentStroke!.isValid) {
-      // Add stroke
-      ref.read(strokesProvider.notifier).addStroke(_currentStroke!);
-      
-      // Calculate bounds for all strokes
-      final allStrokes = ref.read(strokesProvider);
-      final bounds = StrokeBounds.calculateBounds(allStrokes);
-      
-      if (bounds != null) {
-        // Save image
-        await ImageService.saveCanvasAsPng(_canvasKey, bounds);
+    double minX = double.infinity;
+    double minY = double.infinity;
+    double maxX = -double.infinity;
+    double maxY = -double.infinity;
+
+    for (final stroke in strokes) {
+      for (final point in stroke.points) {
+        minX = min(minX, point.dx);
+        minY = min(minY, point.dy);
+        maxX = max(maxX, point.dx);
+        maxY = max(maxY, point.dy);
       }
     }
-    
-    setState(() {
-      _isDrawing = false;
-      _currentStroke = null;
-    });
+
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 }
 
-/// CustomPainter responsible for canvas drawing
-class _CanvasPainter extends CustomPainter {
+/// Custom painter for drawing strokes
+class _DrawingPainter extends CustomPainter {
   final List<Stroke> strokes;
-  final Stroke? currentStroke;
+  final List<Offset> currentPoints;
+  final bool isDrawing;
 
-  _CanvasPainter({
+  _DrawingPainter({
     required this.strokes,
-    this.currentStroke,
+    required this.currentPoints,
+    required this.isDrawing,
   });
 
   @override
@@ -118,12 +128,17 @@ class _CanvasPainter extends CustomPainter {
     }
 
     // Draw current stroke being drawn
-    if (currentStroke != null && currentStroke!.isValid) {
-      _drawStroke(canvas, currentStroke!);
+    if (isDrawing && currentPoints.length > 1) {
+      final currentStroke = Stroke(
+        points: currentPoints,
+        color: Colors.black,
+        strokeWidth: 18.0,
+      );
+      _drawStroke(canvas, currentStroke);
     }
   }
 
-  /// Draw individual stroke
+  /// Draw a single stroke
   void _drawStroke(Canvas canvas, Stroke stroke) {
     if (stroke.points.length < 2) return;
 
@@ -145,7 +160,5 @@ class _CanvasPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true; // Always repaint (can be optimized for performance if needed)
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 } 
