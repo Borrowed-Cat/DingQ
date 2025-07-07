@@ -4,13 +4,21 @@ import '../widgets/drawing_canvas.dart';
 import '../widgets/floating_undo_button.dart';
 import '../widgets/floating_clear_button.dart';
 import '../widgets/dingbat_grid.dart';
+import '../widgets/recommended_dingbats_display.dart';
 
 /// Main home page
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  GlobalKey? _canvasKey;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -39,28 +47,49 @@ class HomePage extends ConsumerWidget {
                   child: const DingbatGrid(),
                 ),
                 
-                // Right: drawing canvas (half)
+                // Right: drawing canvas and recommendations (half)
                 Expanded(
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Stack(
+                    child: Column(
                       children: [
-                        // Drawing canvas area
-                        const DrawingCanvas(),
-                        
-                        // Undo button (bottom left)
-                        const Positioned(
-                          left: 20,
-                          bottom: 20,
-                          child: FloatingUndoButton(),
+                        // Top: drawing canvas area
+                        Expanded(
+                          flex: 3,
+                          child: Stack(
+                            children: [
+                              DrawingCanvas(
+                                onCanvasKeyCreated: (key) {
+                                  setState(() {
+                                    _canvasKey = key;
+                                  });
+                                },
+                              ),
+                              
+                              // Undo button (bottom left)
+                              Positioned(
+                                left: 20,
+                                bottom: 20,
+                                child: FloatingUndoButton(canvasKey: _canvasKey),
+                              ),
+                              
+                              // Clear button (next to undo button)
+                              const Positioned(
+                                left: 88,
+                                bottom: 20,
+                                child: FloatingClearButton(),
+                              ),
+                            ],
+                          ),
                         ),
                         
-                        // Clear button (next to undo button)
-                        const Positioned(
-                          left: 88,
-                          bottom: 20,
-                          child: FloatingClearButton(),
+                        const SizedBox(height: 16),
+                        
+                        // Bottom: recommended dingbats
+                        Expanded(
+                          flex: 2,
+                          child: const RecommendedDingbatsDisplay(),
                         ),
                       ],
                     ),
@@ -78,28 +107,49 @@ class HomePage extends ConsumerWidget {
                   child: const DingbatGrid(),
                 ),
                 
-                // Bottom: drawing canvas (half)
+                // Bottom: drawing canvas and recommendations (half)
                 Expanded(
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Stack(
+                    child: Row(
                       children: [
-                        // Drawing canvas area
-                        const DrawingCanvas(),
-                        
-                        // Undo button (bottom left)
-                        const Positioned(
-                          left: 20,
-                          bottom: 20,
-                          child: FloatingUndoButton(),
+                        // Left: drawing canvas area
+                        Expanded(
+                          flex: 3,
+                          child: Stack(
+                            children: [
+                              DrawingCanvas(
+                                onCanvasKeyCreated: (key) {
+                                  setState(() {
+                                    _canvasKey = key;
+                                  });
+                                },
+                              ),
+                              
+                              // Undo button (bottom left)
+                              Positioned(
+                                left: 20,
+                                bottom: 20,
+                                child: FloatingUndoButton(canvasKey: _canvasKey),
+                              ),
+                              
+                              // Clear button (next to undo button)
+                              const Positioned(
+                                left: 88,
+                                bottom: 20,
+                                child: FloatingClearButton(),
+                              ),
+                            ],
+                          ),
                         ),
                         
-                        // Clear button (next to undo button)
-                        const Positioned(
-                          left: 88,
-                          bottom: 20,
-                          child: FloatingClearButton(),
+                        const SizedBox(width: 16),
+                        
+                        // Right: recommended dingbats
+                        Expanded(
+                          flex: 2,
+                          child: const RecommendedDingbatsDisplay(),
                         ),
                       ],
                     ),

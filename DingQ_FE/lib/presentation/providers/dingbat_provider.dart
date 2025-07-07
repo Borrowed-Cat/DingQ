@@ -92,3 +92,30 @@ final dingbatsProvider = StateNotifierProvider<DingbatNotifier, List<Dingbat>>((
 
 /// 선택된 태그 상태 관리
 final selectedTagProvider = StateProvider<String>((ref) => ''); 
+
+/// API response for recommended dingbats
+class RecommendedDingbatsNotifier extends StateNotifier<Map<String, dynamic>?> {
+  RecommendedDingbatsNotifier() : super(null);
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  void setLoading(bool loading) {
+    _isLoading = loading;
+  }
+
+  void setRecommendedDingbats(Map<String, dynamic> response) {
+    _isLoading = false;
+    state = response;
+  }
+
+  void clearRecommendedDingbats() {
+    _isLoading = false;
+    state = null;
+  }
+}
+
+/// Recommended dingbats provider
+final recommendedDingbatsProvider = StateNotifierProvider<RecommendedDingbatsNotifier, Map<String, dynamic>?>((ref) {
+  return RecommendedDingbatsNotifier();
+}); 

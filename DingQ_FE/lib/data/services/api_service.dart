@@ -9,7 +9,10 @@ class ApiService {
   static const String searchEndpoint = '/search';
 
   /// Send image to similarity search API
-  static Future<Map<String, dynamic>?> searchSimilarImages(Uint8List imageBytes) async {
+  static Future<Map<String, dynamic>?> searchSimilarImages(
+    Uint8List imageBytes, {
+    Function(Map<String, dynamic>)? onResponse,
+  }) async {
     try {
       final url = Uri.parse('$baseUrl$searchEndpoint');
       
@@ -56,6 +59,9 @@ class ApiService {
           print('     URL: ${result['url']}');
         }
         print('===================');
+        
+        // Call callback if provided
+        onResponse?.call(jsonResponse);
         
         return jsonResponse;
       } else {

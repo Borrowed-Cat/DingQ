@@ -12,8 +12,9 @@ class ImageService {
   /// Send canvas area to API (crop by stroke bounds + add margin)
   static Future<void> sendCanvasToApi(
     GlobalKey canvasKey,
-    Rect bounds,
-  ) async {
+    Rect bounds, {
+    Function(Map<String, dynamic>)? onResponse,
+  }) async {
     try {
       print('=== Image Generation ===');
       print('Canvas Bounds: $bounds');
@@ -76,7 +77,7 @@ class ImageService {
       print('===================');
 
       // Send to API
-      await ApiService.searchSimilarImages(pngBytes);
+      await ApiService.searchSimilarImages(pngBytes, onResponse: onResponse);
       
     } catch (e) {
       print('Error sending image to API: $e');

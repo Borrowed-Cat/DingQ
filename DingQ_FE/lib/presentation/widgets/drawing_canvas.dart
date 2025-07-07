@@ -4,19 +4,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/services/image_service.dart';
 import '../../domain/entities/stroke.dart';
 import '../providers/stroke_provider.dart';
+import '../providers/dingbat_provider.dart';
 
 /// Drawing canvas widget
 class DrawingCanvas extends ConsumerStatefulWidget {
-  const DrawingCanvas({super.key});
+  final Function(GlobalKey)? onCanvasKeyCreated;
+  
+  const DrawingCanvas({super.key, this.onCanvasKeyCreated});
 
   @override
-  ConsumerState<DrawingCanvas> createState() => _DrawingCanvasState();
+  ConsumerState<DrawingCanvas> createState() => DrawingCanvasState();
 }
 
-class _DrawingCanvasState extends ConsumerState<DrawingCanvas> {
-  final GlobalKey _canvasKey = GlobalKey();
+class DrawingCanvasState extends ConsumerState<DrawingCanvas> {
+  final GlobalKey canvasKey = GlobalKey();
   List<Offset> _currentPoints = [];
   bool _isDrawing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Call the callback when the canvasKey is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onCanvasKeyCreated?.call(canvasKey);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +59,11 @@ class _DrawingCanvasState extends ConsumerState<DrawingCanvas> {
           ref.read(strokesProvider.notifier).addStroke(stroke);
 
           // Send to API
-          _sendToApi();
+          DrawingCanvasUtils.sendToApi(
+            canvasKey: canvasKey,
+            ref: ref,
+            strokes: List.from(ref.read(strokesProvider)),
+          );
 
           setState(() {
             _isDrawing = false;
@@ -56,7 +72,7 @@ class _DrawingCanvasState extends ConsumerState<DrawingCanvas> {
         }
       },
       child: RepaintBoundary(
-        key: _canvasKey,
+        key: canvasKey,
         child: Container(
           width: double.infinity,
           height: double.infinity,
@@ -72,29 +88,33 @@ class _DrawingCanvasState extends ConsumerState<DrawingCanvas> {
       ),
     );
   }
+}
 
-  /// Send current drawing to API
-  void _sendToApi() {
-    final strokes = ref.read(strokesProvider);
+class DrawingCanvasUtils {
+  static void sendToApi({
+    required GlobalKey canvasKey,
+    required WidgetRef ref,
+    required List<Stroke> strokes,
+  }) {
     if (strokes.isEmpty) return;
-
-    // Calculate bounds of all strokes
-    final bounds = _calculateStrokeBounds(strokes);
+    final bounds = calculateStrokeBounds(strokes);
     if (bounds == null) return;
-
-    // Send to API
-    ImageService.sendCanvasToApi(_canvasKey, bounds);
+    ref.read(recommendedDingbatsProvider.notifier).setLoading(true);
+    ImageService.sendCanvasToApi(
+      canvasKey,
+      bounds,
+      onResponse: (response) {
+        ref.read(recommendedDingbatsProvider.notifier).setRecommendedDingbats(response);
+      },
+    );
   }
 
-  /// Calculate bounding rectangle of all strokes
-  Rect? _calculateStrokeBounds(List<Stroke> strokes) {
+  static Rect? calculateStrokeBounds(List<Stroke> strokes) {
     if (strokes.isEmpty) return null;
-
     double minX = double.infinity;
     double minY = double.infinity;
     double maxX = -double.infinity;
     double maxY = -double.infinity;
-
     for (final stroke in strokes) {
       for (final point in stroke.points) {
         minX = min(minX, point.dx);
@@ -103,7 +123,6 @@ class _DrawingCanvasState extends ConsumerState<DrawingCanvas> {
         maxY = max(maxY, point.dy);
       }
     }
-
     return Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 }

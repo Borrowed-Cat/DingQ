@@ -3,12 +3,12 @@ import '../../domain/entities/stroke.dart';
 import '../../data/repositories/stroke_repository_impl.dart';
 import '../../application/usecases/stroke_usecases.dart';
 
-/// Stroke 리포지토리 프로바이더
+/// Stroke repository provider
 final strokeRepositoryProvider = Provider<StrokeRepositoryImpl>((ref) {
   return StrokeRepositoryImpl();
 });
 
-/// Stroke 관련 유스케이스 프로바이더들
+/// Providers for stroke-related use cases
 final addStrokeUseCaseProvider = Provider<AddStrokeUseCase>((ref) {
   final repository = ref.watch(strokeRepositoryProvider);
   return AddStrokeUseCase(repository);
@@ -29,7 +29,7 @@ final getStrokesUseCaseProvider = Provider<GetStrokesUseCase>((ref) {
   return GetStrokesUseCase(repository);
 });
 
-/// Stroke 상태 관리 Notifier
+/// State notifier for managing strokes
 class StrokesNotifier extends StateNotifier<List<Stroke>> {
   final AddStrokeUseCase _addStrokeUseCase;
   final UndoStrokeUseCase _undoStrokeUseCase;
@@ -49,37 +49,37 @@ class StrokesNotifier extends StateNotifier<List<Stroke>> {
     _refreshState();
   }
 
-  /// 상태 새로고침
+  /// Refresh state
   void _refreshState() {
     state = _getStrokesUseCase();
   }
 
-  /// 새로운 Stroke 추가
+  /// Add a new stroke
   void addStroke(Stroke stroke) {
     _addStrokeUseCase(stroke);
     _refreshState();
   }
 
-  /// 가장 최근 Stroke 제거 (Undo)
+  /// Remove the most recent stroke (Undo)
   void undo() {
     _undoStrokeUseCase();
     _refreshState();
   }
 
-  /// 모든 Stroke 제거 (Clear)
+  /// Remove all strokes (Clear)
   void clear() {
     _clearStrokesUseCase();
     _refreshState();
   }
 
-  /// 현재 Stroke 개수 반환
+  /// Return the current number of strokes
   int get strokeCount => state.length;
 
-  /// Stroke가 비어있는지 확인
+  /// Check if strokes are empty
   bool get isEmpty => state.isEmpty;
 }
 
-/// Stroke 상태 관리 프로바이더
+/// Provider for managing stroke state
 final strokesProvider = StateNotifierProvider<StrokesNotifier, List<Stroke>>((ref) {
   return StrokesNotifier(
     addStrokeUseCase: ref.watch(addStrokeUseCaseProvider),

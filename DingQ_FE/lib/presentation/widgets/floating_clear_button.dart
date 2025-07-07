@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/stroke_provider.dart';
+import '../providers/dingbat_provider.dart';
 
-/// 원형 Clear 버튼
+/// Circular Clear button
 class FloatingClearButton extends ConsumerWidget {
   const FloatingClearButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strokes = ref.watch(strokesProvider);
-    final notifier = ref.read(strokesProvider.notifier);
+    final strokesNotifier = ref.read(strokesProvider.notifier);
+    final recommendedDingbatsNotifier = ref.read(recommendedDingbatsProvider.notifier);
 
     return Container(
       width: 56,
@@ -30,7 +32,10 @@ class FloatingClearButton extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: strokes.isNotEmpty ? () => notifier.clear() : null,
+          onTap: strokes.isNotEmpty ? () {
+            strokesNotifier.clear();
+            recommendedDingbatsNotifier.clearRecommendedDingbats();
+          } : null,
           borderRadius: BorderRadius.circular(28),
           child: Center(
             child: Icon(
