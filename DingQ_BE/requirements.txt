@@ -2,7 +2,6 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
-Pillow==10.1.0
 
 # Database
 psycopg2-binary==2.9.9
@@ -19,6 +18,13 @@ transformers==4.53.0
 pillow==11.2.1
 opencv-python==4.11.0.86
 scikit-learn==1.7.0
+
+# AI Generation
+google-genai
+
+# Google Cloud Storage
+google-cloud-storage==2.10.0
+google-cloud-secret-manager==2.16.4
 
 # Environment
 python-dotenv==1.0.0

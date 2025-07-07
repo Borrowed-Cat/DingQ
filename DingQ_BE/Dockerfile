@@ -35,6 +35,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY app/ .
 
+# Copy Google Cloud Service Account key
+COPY gcs-service-account.json /app/gcs-service-account.json
+
+# Set GCS environment variables
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/gcs-service-account.json
+ENV GCS_BUCKET_NAME=dingq-generated-icons
+
+# Set Gemini AI API key from environment variable (NO hardcoded values!)
+# ENV GOOGLE_API_KEY will be set at runtime via docker run -e
+
 # Create .env file from environment variables
 RUN echo "Creating .env file from environment variables"
 
