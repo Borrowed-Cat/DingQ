@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
-/// 사용자가 그린 한 번의 선을 나타내는 엔티티
+/// Stroke entity representing a single line drawn by the user
 class Stroke {
   final List<Offset> points;
   final Color color;
@@ -12,10 +13,10 @@ class Stroke {
     this.strokeWidth = 3.0,
   });
 
-  /// 빈 Stroke 생성
+  /// Create empty stroke
   factory Stroke.empty() => const Stroke(points: []);
 
-  /// 새로운 점을 추가한 Stroke 생성
+  /// Create stroke with new point added
   Stroke addPoint(Offset point) {
     final newPoints = List<Offset>.from(points)..add(point);
     return Stroke(
@@ -25,8 +26,34 @@ class Stroke {
     );
   }
 
-  /// Stroke가 유효한지 확인 (최소 2개 이상의 점이 있어야 함)
+  /// Check if stroke is valid (must have at least 2 points)
   bool get isValid => points.length >= 2;
+
+  /// Calculate stroke bounds (x, y min/max values)
+  Rect? getBounds() {
+    if (points.isEmpty) return null;
+    
+    double minX = points.first.dx;
+    double maxX = points.first.dx;
+    double minY = points.first.dy;
+    double maxY = points.first.dy;
+    
+    for (final point in points) {
+      minX = min(minX, point.dx);
+      maxX = max(maxX, point.dx);
+      minY = min(minY, point.dy);
+      maxY = max(maxY, point.dy);
+    }
+    
+    // Expand bounds considering stroke width
+    final halfWidth = strokeWidth / 2;
+    return Rect.fromLTRB(
+      minX - halfWidth,
+      minY - halfWidth,
+      maxX + halfWidth,
+      maxY + halfWidth,
+    );
+  }
 
   @override
   bool operator ==(Object other) {

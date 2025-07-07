@@ -5,7 +5,7 @@ import '../widgets/floating_undo_button.dart';
 import '../widgets/floating_clear_button.dart';
 import '../widgets/dingbat_grid.dart';
 
-/// 메인 홈 페이지
+/// Main home page
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
@@ -26,37 +26,37 @@ class HomePage extends ConsumerWidget {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // 화면 너비에 따라 레이아웃 결정
+          // Determine layout based on screen width
           final isWideScreen = constraints.maxWidth > 800;
           
           if (isWideScreen) {
-            // 넓은 화면: 좌우 분할
+            // Wide screen: left-right split
             return Row(
               children: [
-                // 좌측: 딩벳 그리드 (절반)
+                // Left: dingbat grid (half)
                 Expanded(
                   flex: 1,
                   child: const DingbatGrid(),
                 ),
                 
-                // 우측: 드로잉 캔버스 (절반)
+                // Right: drawing canvas (half)
                 Expanded(
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Stack(
                       children: [
-                        // 드로잉 캔버스 영역
+                        // Drawing canvas area
                         const DrawingCanvas(),
                         
-                        // Undo 버튼 (좌하단)
+                        // Undo button (bottom left)
                         const Positioned(
                           left: 20,
                           bottom: 20,
                           child: FloatingUndoButton(),
                         ),
                         
-                        // Clear 버튼 (Undo 버튼 바로 옆)
+                        // Clear button (next to undo button)
                         const Positioned(
                           left: 88,
                           bottom: 20,
@@ -69,33 +69,33 @@ class HomePage extends ConsumerWidget {
               ],
             );
           } else {
-            // 좁은 화면: 상하 분할
+            // Narrow screen: top-bottom split
             return Column(
               children: [
-                // 상단: 딩벳 그리드 (절반)
+                // Top: dingbat grid (half)
                 Expanded(
                   flex: 1,
                   child: const DingbatGrid(),
                 ),
                 
-                // 하단: 드로잉 캔버스 (절반)
+                // Bottom: drawing canvas (half)
                 Expanded(
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Stack(
                       children: [
-                        // 드로잉 캔버스 영역
+                        // Drawing canvas area
                         const DrawingCanvas(),
                         
-                        // Undo 버튼 (좌하단)
+                        // Undo button (bottom left)
                         const Positioned(
                           left: 20,
                           bottom: 20,
                           child: FloatingUndoButton(),
                         ),
                         
-                        // Clear 버튼 (Undo 버튼 바로 옆)
+                        // Clear button (next to undo button)
                         const Positioned(
                           left: 88,
                           bottom: 20,

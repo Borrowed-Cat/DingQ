@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'presentation/pages/home_page.dart';
-import 'presentation/providers/dingbat_provider.dart';
 
 void main() {
   runApp(
@@ -11,7 +10,7 @@ void main() {
   );
 }
 
-/// 메인 앱 클래스
+/// Main app class
 class DrawingApp extends StatelessWidget {
   const DrawingApp({super.key});
 
