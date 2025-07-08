@@ -9,7 +9,7 @@ PROJECT_ID=${1:-"your-project-id"}  # 첫 번째 인자 또는 기본값
 REGION=${2:-"asia-northeast3"}      # 두 번째 인자 또는 기본값 (서울)
 SERVICE_NAME="dingq-api"
 IMAGE_NAME="gcr.io/$PROJECT_ID/$SERVICE_NAME"
-GCS_BUCKET="$PROJECT_ID-dingq-icons"
+GCS_BUCKET="dingq-icons"
 
 echo "🚀 DingQ API를 Cloud Run에 배포합니다..."
 echo "📋 프로젝트: $PROJECT_ID"
