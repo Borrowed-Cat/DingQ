@@ -33,6 +33,10 @@ services:
       - DATABASE_URL=postgresql://dingq_user:dingq_password@postgres:5432/dingq_db
       - CLIP_MODEL_NAME=openai/clip-vit-base-patch32
       - LOG_LEVEL=INFO
+      - ENVIRONMENT=production
+      - GOOGLE_CLOUD_PROJECT=ceremonial-hold-463014-r7
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcs-service-account.json
+      - GCS_BUCKET_NAME=dingq-icons
     depends_on:
       postgres:
         condition: service_healthy

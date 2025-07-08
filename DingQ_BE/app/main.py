@@ -30,7 +30,14 @@ from model.clip_search import CLIPImageSearcher
 from model.generate_icon import generate_with_retries
 
 # Import database and models (simplified for deployment)
-from database import create_tables
+try:
+    from database import create_tables
+    DATABASE_AVAILABLE = True
+except ImportError:
+    DATABASE_AVAILABLE = False
+    def create_tables():
+        """Dummy function when database is not available"""
+        pass
 
 # Security middleware removed for simplicity
 
@@ -107,6 +114,12 @@ def initialize_secrets():
         
         if not GOOGLE_API_KEY:
             logger.error("❌ Gemini API 키를 Secret Manager에서 가져올 수 없습니다!")
+        else:
+            # API 키에서 공백과 개행문자 제거
+            GOOGLE_API_KEY = GOOGLE_API_KEY.strip()
+            # 환경변수로 설정하여 generate_icon.py에서 사용할 수 있도록 함
+            os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+            logger.info(f"✅ Gemini API 키 환경변수 설정 완료 (길이: {len(GOOGLE_API_KEY)}자)")
             
     else:
         # 개발 환경에서는 환경변수 사용

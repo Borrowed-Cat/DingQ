@@ -1,6 +1,7 @@
 import threading
 import os
 import queue
+import base64
 from io import BytesIO
 
 from google import genai
@@ -29,18 +30,13 @@ prompt = """
 
 def generate_icon(run_id, input_text, input_image, result_queue, temperature):
     try:
-        # Gemini AI 클라이언트 생성 (환경변수 GOOGLE_API_KEY 사용)
-        api_key = os.getenv("GOOGLE_API_KEY")
-        if not api_key:
-            raise ValueError("GOOGLE_API_KEY 환경변수가 설정되지 않았습니다.")
-        
-        client = genai.Client(api_key=api_key)
+        client = genai.Client()
         user_text = f"이 아이콘은 '{input_text}'의 심볼입니다."
 
-        # 현재 파일의 디렉토리 기준으로 이미지 경로 설정
+        # 현재 파일의 디렉토리를 기준으로 절대 경로 생성
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_total_path = os.path.join(current_dir, 'total_dingbat.png')
-        image_total = Image.open(image_total_path)  # 기준 스타일 이미지
+        total_dingbat_path = os.path.join(current_dir, 'total_dingbat.png')
+        image_total = Image.open(total_dingbat_path)  # 기준 스타일 이미지
 
         response = client.models.generate_content(
             model="gemini-2.0-flash-preview-image-generation",
@@ -51,10 +47,70 @@ def generate_icon(run_id, input_text, input_image, result_queue, temperature):
             ),
         )
         if response and response.candidates and len(response.candidates) > 0 and response.candidates[0].content:
+            has_image = False
             for part in response.candidates[0].content.parts: # type: ignore
                 if part.inline_data is not None:
-                    generated_image = Image.open(BytesIO(part.inline_data.data)) # type: ignore
-                    result_queue.put((run_id, generated_image))
+                    has_image = True
+                    try:
+                        # 이미지 데이터 검증 및 안전한 변환
+                        image_data = part.inline_data.data # type: ignore
+                        mime_type = getattr(part.inline_data, 'mime_type', 'unknown') # type: ignore
+                        print(f"[Run {run_id}] 이미지 데이터 수신: {len(image_data) if image_data else 0} bytes, MIME: {mime_type}")
+                        
+                        if image_data and len(image_data) > 0:
+                            # 처음 몇 바이트를 확인해서 이미지 포맷 추정
+                            if len(image_data) >= 8:
+                                header = image_data[:8]
+                                print(f"[Run {run_id}] 파일 헤더: {header.hex()}")
+                                
+                                # Base64 인코딩된 데이터인지 확인 (iVBORw로 시작하면 Base64 PNG)
+                                if header == b'iVBORw0K':
+                                    print(f"[Run {run_id}] Base64 인코딩된 PNG 데이터 감지됨")
+                                    try:
+                                        # Base64 디코딩
+                                        decoded_data = base64.b64decode(image_data)
+                                        print(f"[Run {run_id}] Base64 디코딩 완료: {len(decoded_data)} bytes")
+                                        image_data = decoded_data
+                                        # 디코딩된 헤더 확인
+                                        decoded_header = image_data[:8]
+                                        print(f"[Run {run_id}] 디코딩된 헤더: {decoded_header.hex()}")
+                                    except Exception as decode_error:
+                                        print(f"[Run {run_id}] Base64 디코딩 실패: {decode_error}")
+                                        continue
+                                
+                                # PNG 헤더 확인 (89 50 4E 47 0D 0A 1A 0A)
+                                if image_data[:8].startswith(b'\x89PNG\r\n\x1a\n'):
+                                    print(f"[Run {run_id}] PNG 포맷 감지됨")
+                                # JPEG 헤더 확인 (FF D8)
+                                elif image_data[:8].startswith(b'\xFF\xD8'):
+                                    print(f"[Run {run_id}] JPEG 포맷 감지됨")
+                                # WEBP 헤더 확인
+                                elif b'WEBP' in image_data[:12]:
+                                    print(f"[Run {run_id}] WEBP 포맷 감지됨")
+                                else:
+                                    print(f"[Run {run_id}] 알 수 없는 이미지 포맷")
+                            
+                            image_bytes = BytesIO(image_data)
+                            image_bytes.seek(0)  # 포인터를 처음으로 이동
+                            generated_image = Image.open(image_bytes)
+                            # 이미지가 정상적으로 로드되었는지 확인
+                            generated_image.verify()
+                            # verify() 후에는 이미지를 다시 로드해야 함
+                            image_bytes.seek(0)
+                            generated_image = Image.open(image_bytes)
+                            print(f"[Run {run_id}] 이미지 성공적으로 로드됨: {generated_image.size}, 모드: {generated_image.mode}")
+                            result_queue.put((run_id, generated_image))
+                            return  # 성공 시 즉시 반환
+                        else:
+                            print(f"[Run {run_id}] 빈 이미지 데이터 수신")
+                    except Exception as img_error:
+                        print(f"[Run {run_id}] 이미지 처리 오류: {img_error}")
+                        print(f"[Run {run_id}] 오류 타입: {type(img_error).__name__}")
+                elif hasattr(part, 'text') and part.text:
+                    print(f"[Run {run_id}] API 텍스트 응답: {part.text[:100]}...")
+            
+            if not has_image:
+                print(f"[Run {run_id}] 응답에 이미지 데이터가 없습니다.")
         else:
             print(f"[Run {run_id}] 응답이 비어있거나 올바르지 않습니다.")
             result_queue.put((run_id, None))
