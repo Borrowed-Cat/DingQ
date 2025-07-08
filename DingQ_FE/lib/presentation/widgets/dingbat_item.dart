@@ -18,18 +18,7 @@ class DingbatItem extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.grey.shade200.withOpacity(0.5),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Material(
           color: Colors.transparent,
@@ -43,7 +32,7 @@ class DingbatItem extends StatelessWidget {
                 ),
               );
             },
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: Column(

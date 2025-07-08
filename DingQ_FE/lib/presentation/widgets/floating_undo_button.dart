@@ -22,7 +22,7 @@ class FloatingUndoButton extends ConsumerWidget {
       height: 56,
       decoration: BoxDecoration(
         color: strokes.isNotEmpty 
-            ? Colors.blue.shade600 
+            ? Colors.black 
             : Colors.grey.shade400,
         shape: BoxShape.circle,
         boxShadow: [

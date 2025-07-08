@@ -17,8 +17,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,19 +26,13 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
               // Header
               Row(
                 children: [
-                  Icon(
-                    Icons.recommend,
-                    color: Colors.blue.shade700,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Recommended Dingbats',
-                      style: TextStyle(
-                        fontSize: 14,
+                      '유사도 높은 딩벳',
+                      style: const TextStyle(
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
+                        color: Colors.black,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -91,8 +84,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,19 +93,13 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
             // Header
             Row(
               children: [
-                Icon(
-                  Icons.recommend,
-                  color: Colors.blue.shade700,
-                  size: 16,
-                ),
-                const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
-                    'Recommended Dingbats',
+                  child: const Text(
+                    '유사도 높은 딩벳',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade700,
+                      color: Colors.black,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -164,8 +150,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,19 +159,13 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
               // Header
               Row(
                 children: [
-                  Icon(
-                    Icons.recommend,
-                    color: Colors.blue.shade700,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 6),
                   Expanded(
-                    child: Text(
-                      'Recommended Dingbats',
+                    child: const Text(
+                      '유사도 높은 딩벳',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
+                        color: Colors.black,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -213,15 +192,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                         margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: Colors.grey.shade300),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.shade200,
-                              blurRadius: 1,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -241,7 +212,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                                   height: 32,
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: const Icon(
                                     Icons.image,
@@ -304,15 +275,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                         margin: const EdgeInsets.only(bottom: 4),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: Colors.grey.shade300),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.shade200,
-                              blurRadius: 1,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
                           children: [
@@ -331,7 +294,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                                   height: 28,
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: const Icon(
                                     Icons.image,

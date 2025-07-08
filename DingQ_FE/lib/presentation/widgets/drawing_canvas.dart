@@ -76,7 +76,10 @@ class DrawingCanvasState extends ConsumerState<DrawingCanvas> {
         child: Container(
           width: double.infinity,
           height: double.infinity,
-          color: Colors.white,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: CustomPaint(
             painter: _DrawingPainter(
               strokes: strokes,
