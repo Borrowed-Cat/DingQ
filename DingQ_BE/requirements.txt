@@ -12,9 +12,9 @@ alembic==1.13.1
 # Utilities
 requests==2.31.0
 
-# ML dependencies (CPU-only PyTorch handled in Dockerfile)
+# ML dependencies
 numpy==1.24.3
-torch==2.0.1+cpu
+torch==2.0.1
 transformers==4.30.0
 pillow==10.0.0
 opencv-python-headless==4.8.0.74
