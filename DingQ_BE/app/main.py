@@ -646,7 +646,8 @@ async def get_recent_generated_images(
 
 
 @app.get("/proxy/image/{filename:path}")
-async def proxy_gcs_image(filename: str):
+@app.options("/proxy/image/{filename:path}")
+async def proxy_gcs_image(filename: str, request: Request):
     """
     GCS 이미지 프록시 엔드포인트 - CORS 헤더 포함
     
@@ -656,6 +657,22 @@ async def proxy_gcs_image(filename: str):
     Returns:
         이미지 파일 (CORS 헤더 포함)
     """
+    # CORS 헤더 설정
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Max-Age": "3600"
+    }
+    
+    # OPTIONS 요청 처리 (CORS preflight)
+    if request.method == "OPTIONS":
+        from fastapi.responses import Response
+        return Response(
+            content="",
+            headers=headers
+        )
+    
     try:
         # GCS에서 이미지 다운로드
         gcs_client = get_gcs_client()
@@ -675,15 +692,11 @@ async def proxy_gcs_image(filename: str):
         # 콘텐츠 타입 결정
         content_type = blob.content_type or "image/png"
         
+        # 캐시 헤더 추가
+        headers["Cache-Control"] = "public, max-age=3600"
+        
         # CORS 헤더 포함한 응답 생성
         from fastapi.responses import Response
-        
-        headers = {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-            "Access-Control-Allow-Headers": "*",
-            "Cache-Control": "public, max-age=3600"
-        }
         
         return Response(
             content=image_data,
