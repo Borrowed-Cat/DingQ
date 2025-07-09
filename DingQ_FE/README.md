@@ -88,7 +88,7 @@ Example response format:
 {
   "processing_time": 0.21,
   "total_results": 5,
-  "top5": [
+  "top100": [
     {
       "label": "icon_name",
       "score": 0.7822,

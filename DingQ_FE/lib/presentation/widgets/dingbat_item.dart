@@ -44,10 +44,26 @@ class DingbatItem extends StatelessWidget {
                       dingbat.assetPath,
                       width: 40,
                       height: 40,
+                      fit: BoxFit.contain,
                       colorFilter: ColorFilter.mode(
-                        Colors.grey.shade700,
+                        Colors.grey.shade600,
                         BlendMode.srcIn,
                       ),
+                      placeholderBuilder: (context) {
+                        return Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.image,
+                            color: Colors.grey.shade400,
+                            size: 20,
+                          ),
+                        );
+                      },
                     ),
                   ),
                   

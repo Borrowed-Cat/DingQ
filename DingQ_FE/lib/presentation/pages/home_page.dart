@@ -6,6 +6,9 @@ import '../widgets/floating_clear_button.dart';
 import '../widgets/dingbat_grid.dart';
 import '../widgets/recommended_dingbats_display.dart';
 import '../widgets/floating_genai_button.dart';
+import '../widgets/ai_generation_modal.dart';
+import '../providers/stroke_provider.dart';
+import '../providers/genai_provider.dart';
 import '../widgets/tag_filter.dart';
 
 /// Main home page
@@ -22,8 +25,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
-      body: LayoutBuilder(
+      backgroundColor: Colors.grey.shade100,
+      body: Stack(
+        children: [
+          LayoutBuilder(
         builder: (context, constraints) {
           // Determine layout based on screen width
           final isWideScreen = constraints.maxWidth > 800;
@@ -96,10 +101,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     ),
                                     
                                     // GenAI button (bottom right)
-                                    const Positioned(
+                                    Positioned(
                                       right: 20,
                                       bottom: 20,
-                                      child: FloatingGenAIButton(),
+                                      child: Consumer(
+                                        builder: (context, ref, child) {
+                                          final strokes = ref.watch(strokesProvider);
+                                          return FloatingGenAIButton(
+                                            canvasKey: _canvasKey,
+                                            strokes: strokes,
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -189,10 +202,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     ),
                                     
                                     // GenAI button (bottom right)
-                                    const Positioned(
+                                    Positioned(
                                       right: 20,
                                       bottom: 20,
-                                      child: FloatingGenAIButton(),
+                                      child: Consumer(
+                                        builder: (context, ref, child) {
+                                          final strokes = ref.watch(strokesProvider);
+                                          return FloatingGenAIButton(
+                                            canvasKey: _canvasKey,
+                                            strokes: strokes,
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -216,6 +237,26 @@ class _HomePageState extends ConsumerState<HomePage> {
             );
           }
         },
+      ),
+          
+          // AI Generation Modal
+          Consumer(
+            builder: (context, ref, child) {
+              final genAIState = ref.watch(genAIProvider);
+              
+              if (genAIState.showModal && genAIState.result != null) {
+                return AIGenerationModal(
+                  icons: genAIState.result!.icons,
+                  onClose: () {
+                    ref.read(genAIProvider.notifier).hideModal();
+                  },
+                );
+              }
+              
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
     );
   }
