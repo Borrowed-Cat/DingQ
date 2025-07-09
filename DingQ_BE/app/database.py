@@ -15,7 +15,7 @@ load_dotenv()
 
 # Database configuration
 DATABASE_URL = os.getenv(
-    "DATABASE_URL", "postgresql://postgres:password@localhost:5432/dingq_db"
+    "DATABASE_URL", "postgresql://postgres:your_password@localhost:5432/dingq_db"
 )
 
 # SQLAlchemy setup
