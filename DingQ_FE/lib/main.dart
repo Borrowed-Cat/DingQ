@@ -19,6 +19,7 @@ class DrawingApp extends StatelessWidget {
     return MaterialApp(
               title: 'DingQ',
       theme: ThemeData(
+        fontFamily: 'LGEIHeadline',
         primarySwatch: Colors.blue,
         useMaterial3: true,
         appBarTheme: const AppBarTheme(

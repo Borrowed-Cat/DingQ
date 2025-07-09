@@ -32,6 +32,7 @@ class StrokeCounter extends ConsumerWidget {
         child: Text(
           '${strokes.length}',
           style: TextStyle(
+            fontFamily: 'LGEIHeadline',
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: strokes.isEmpty ? Colors.grey.shade500 : Colors.black87,

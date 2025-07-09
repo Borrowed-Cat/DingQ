@@ -269,7 +269,7 @@ class DingbatDataSource {
     // 딩벳 데이터를 Dingbat 객체로 변환
     for (final data in dingbatData) {
       final fileName = data['file'] as String;
-      final name = data['name'] as String;
+      final name = fileName.replaceAll('.svg', '');
       final tags = List<String>.from(data['tags'] as List);
       
       // 파일명에서 확장자 제거하여 ID 생성

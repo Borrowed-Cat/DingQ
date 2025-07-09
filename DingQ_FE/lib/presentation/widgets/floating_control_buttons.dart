@@ -114,6 +114,7 @@ class FloatingControlButtons extends ConsumerWidget {
                 Text(
                   label,
                   style: TextStyle(
+                    fontFamily: 'LGEIHeadline',
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: onPressed != null ? Colors.white : Colors.grey.shade500,

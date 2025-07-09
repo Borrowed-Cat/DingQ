@@ -59,6 +59,7 @@ class TagFilter extends ConsumerWidget {
         label: Text(
           label,
           style: TextStyle(
+            fontFamily: 'LGEIHeadline',
             color: isSelected ? Colors.white : Colors.grey.shade700,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),

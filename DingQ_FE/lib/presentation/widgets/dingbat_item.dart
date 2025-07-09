@@ -72,6 +72,7 @@ class DingbatItem extends StatelessWidget {
                   Text(
                     dingbat.name,
                     style: TextStyle(
+                      fontFamily: 'LGEIHeadline',
                       fontSize: 10,
                       color: Colors.grey.shade600,
                       fontWeight: FontWeight.w500,

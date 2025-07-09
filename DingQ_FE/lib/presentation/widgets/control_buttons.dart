@@ -63,6 +63,7 @@ class ControlButtons extends ConsumerWidget {
             child: Text(
               'Strokes: ${strokes.length}',
               style: TextStyle(
+                fontFamily: 'LGEIHeadline',
                 fontWeight: FontWeight.w600,
                 color: Colors.grey.shade700,
                 fontSize: 13,

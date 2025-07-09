@@ -29,7 +29,8 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       '유사도 높은 딩벳',
-                      style: const TextStyle(
+                      style: TextStyle(
+                        fontFamily: 'LGEIHeadline',
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -56,6 +57,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                       Text(
                         '마우스로 그림을 그려\n딩벳을 찾아보세요',
                         style: TextStyle(
+                          fontFamily: 'LGEIHeadline',
                           fontSize: 12,
                           color: Colors.grey.shade600,
                           height: 1.3,
@@ -97,6 +99,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                   child: const Text(
                     '유사도 높은 딩벳',
                     style: TextStyle(
+                      fontFamily: 'LGEIHeadline',
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -121,6 +124,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                   Text(
                     'Searching...',
                     style: TextStyle(
+                      fontFamily: 'LGEIHeadline',
                       fontSize: 10,
                       color: Colors.grey,
                     ),
@@ -170,6 +174,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                     child: const Text(
                       '유사도 높은 딩벳',
                       style: TextStyle(
+                        fontFamily: 'LGEIHeadline',
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -303,6 +308,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                     Text(
                       label,
                       style: TextStyle(
+                        fontFamily: 'LGEIHeadline',
                         fontSize: fontSize,
                         color: Colors.grey.shade600,
                         fontWeight: FontWeight.w500,
@@ -408,6 +414,7 @@ class RecommendedDingbatsDisplay extends ConsumerWidget {
                       child: Text(
                         label,
                         style: TextStyle(
+                          fontFamily: 'LGEIHeadline',
                           fontSize: fontSize,
                           fontWeight: FontWeight.w500,
                         ),

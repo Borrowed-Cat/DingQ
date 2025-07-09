@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:html' as html;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../../domain/entities/generated_icon.dart';
+import '../../utils/download_utils.dart';
 
 class AIGenerationModal extends StatelessWidget {
   final List<GeneratedIcon> icons;
@@ -15,16 +15,7 @@ class AIGenerationModal extends StatelessWidget {
   });
 
   void _downloadImage(GeneratedIcon icon) {
-    // Convert base64 to blob and download
-    final bytes = base64Decode(icon.base64);
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    
-    final anchor = html.AnchorElement(href: url)
-      ..setAttribute('download', icon.filename.split('/').last)
-      ..click();
-    
-    html.Url.revokeObjectUrl(url);
+    DownloadUtils.downloadPngFromBase64(icon.base64, icon.filename.split('/').last);
   }
 
   @override
@@ -65,9 +56,10 @@ class AIGenerationModal extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'AI 생성 결과',
                           style: TextStyle(
+                            fontFamily: 'LGEIHeadline',
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -214,9 +206,10 @@ class AIGenerationModal extends StatelessWidget {
               ),
               child: Text(
                 '${index + 1}',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  fontFamily: 'LGEIHeadline',
                   fontSize: 12,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
