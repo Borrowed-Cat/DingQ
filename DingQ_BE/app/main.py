@@ -645,6 +645,75 @@ async def get_recent_generated_images(
         raise HTTPException(status_code=500, detail=f"최근 이미지 조회 실패: {str(e)}")
 
 
+@app.get("/proxy/image/{filename:path}")
+async def proxy_gcs_image(filename: str):
+    """
+    GCS 이미지 프록시 엔드포인트 - CORS 헤더 포함
+    
+    Args:
+        filename: GCS 버킷 내 파일 경로 (예: generated/20250709_005259_5d1a9794_happy_2.png)
+    
+    Returns:
+        이미지 파일 (CORS 헤더 포함)
+    """
+    try:
+        # GCS에서 이미지 다운로드
+        gcs_client = get_gcs_client()
+        if not gcs_client:
+            raise HTTPException(status_code=500, detail="GCS 클라이언트 초기화 실패")
+        
+        bucket = gcs_client.bucket(GCS_BUCKET_NAME)
+        blob = bucket.blob(filename)
+        
+        # 파일 존재 확인
+        if not blob.exists():
+            raise HTTPException(status_code=404, detail="이미지를 찾을 수 없습니다")
+        
+        # 이미지 데이터 다운로드
+        image_data = blob.download_as_bytes()
+        
+        # 콘텐츠 타입 결정
+        content_type = blob.content_type or "image/png"
+        
+        # CORS 헤더 포함한 응답 생성
+        from fastapi.responses import Response
+        
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Cache-Control": "public, max-age=3600"
+        }
+        
+        return Response(
+            content=image_data,
+            media_type=content_type,
+            headers=headers
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"이미지 프록시 오류: {e}")
+        raise HTTPException(status_code=500, detail="이미지 로드 실패")
+
+
+@app.options("/proxy/image/{filename:path}")
+async def proxy_gcs_image_options(filename: str):
+    """
+    CORS preflight 요청 처리
+    """
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Max-Age": "86400"
+    }
+    
+    from fastapi.responses import Response
+    return Response(headers=headers)
+
+
 if __name__ == "__main__":
     # Cloud Run에서는 PORT 환경변수 사용, 로컬에서는 8000
     port = int(os.getenv("PORT", 8000))
