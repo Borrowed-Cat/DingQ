@@ -199,7 +199,10 @@ def list_gcs_images(prefix: str = "", limit: int = 100) -> List[Dict]:
             return []
         
         bucket = client.bucket(GCS_BUCKET_NAME)
-        blobs = bucket.list_blobs(prefix=prefix, max_results=limit)
+        # 충분한 개수를 가져온 후 API 레벨에서 정렬 및 제한
+        # 최대 10000개까지 조회해서 최신 파일들을 놓치지 않도록 함
+        max_fetch = max(limit * 10, 1000) if limit < 1000 else 10000
+        blobs = bucket.list_blobs(prefix=prefix, max_results=max_fetch)
         
         images = []
         for blob in blobs:
@@ -560,7 +563,7 @@ async def get_gcs_images(
         JSON: 이미지 목록과 메타데이터
     """
     try:
-        # GCS에서 이미지 목록 조회
+        # GCS에서 이미지 목록 조회 (더 많은 개수를 가져옴)
         images = list_gcs_images(prefix=prefix, limit=limit)
         
         # 정렬 처리
@@ -572,6 +575,9 @@ async def get_gcs_images(
             images.sort(key=lambda x: x.get("filename", ""), reverse=reverse_order)
         elif sort_by == "size":
             images.sort(key=lambda x: x.get("size", 0), reverse=reverse_order)
+        
+        # 정렬 후 최종 제한
+        images = images[:limit]
         
         # 응답 데이터 구성
         response_data = {
