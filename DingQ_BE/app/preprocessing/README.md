@@ -16,6 +16,7 @@ Google Gemini API와 CLIP 모델을 활용하여, 이미지와 텍스트의 의�
 ## 📌 2. 멀티모달 임베딩 벡터 생성 – `embedding_pipeline.ipynb`
 
 1. **딩뱃 이미지 전처리 및 증강**
+   : sandstone에서 sandstone_aug
 2. 이미지 + 캡션 데이터를 결합하여  
    **CLIP 모델 기반 멀티모달 임베딩 벡터 생성**
 3. 생성된 벡터들을 **시각화**하여 확인
