@@ -546,7 +546,7 @@ async def generate_icon_api(
 @app.get("/images")
 async def get_gcs_images(
     prefix: str = Query("", description="파일명 접두사 필터 (예: 'generated/', 'user_uploads/')"),
-    limit: int = Query(100, description="최대 조회 개수 (1-1000)", ge=1, le=1000),
+    limit: int = Query(300, description="최대 조회 개수 (1-1000)", ge=1, le=1000),
     sort_by: str = Query("created", description="정렬 기준 (created, filename, size)"),
     order: str = Query("desc", description="정렬 순서 (asc, desc)")
 ):
