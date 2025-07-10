@@ -101,7 +101,7 @@ class CLIPImageSearcher:
         features = features / np.linalg.norm(features)  # L2 정규화
         return features[0]
     
-    def search_similarity(self, image_path, top_k=20):
+    def search_similarity(self, image_path, top_k=100):
         """
         이미지 유사도 검색 함수
         
